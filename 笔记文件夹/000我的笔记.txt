@@ -1,0 +1,312 @@
+#include <stdarg.h>//可变形参头文件
+
+void va_start(va_list ap, last);
+type va_arg(va_list ap, type);
+void va_end(va_list ap);
+void va_copy(va_list dest, va_list src);
+用法:
+	va_start(ap,fmt);
+     while(*fmt)
+     {
+         switch(*fmt++)
+         {
+            case 'd':
+                 i = va_arg(ap,long);
+                 //或者
+               //i = va_arg(ap,int);
+                 printf("d:%d    ",i);
+                 break;
+             case 'f':
+                f = va_arg(ap,double);
+                printf("f:%.2lf ",f);
+                  break;
+             case 'c':
+                 c = (char)va_arg(ap,int);
+                printf("c:%c    ",c);
+                 break;
+              case 's':
+                s = va_arg(ap,char*);
+                  printf("s:%s    ",s);
+                 break;        
+		}
+	}
+    putchar('\n');
+    va_end(ap);
+
+
+
+
+
+
+
+#include <sys/types.h>//目录操作头文件
+#include <dirent.h>
+
+	struct dirent {
+			ino_t d_ino; /* 节点号 */
+			off_t d_off; /* 偏移量 */
+			unsigned short d_reclen; /* 文件的长度*/
+			unsigned char d_type; /* 文件的类型，目录==4，普通文件==8*/
+			char d_name[256]; /* 文件名称 */
+		};
+	/*创建目录之前，需要先执行 umask（0） 然后再调用 mkdir 函数。*/
+	umask(0);
+	mkdir(argv[1],S_IRWXO);
+
+	DIR *opendir(const char *name);//
+	int closedir(DIR *dirp)；
+	struct dirent *readdir(DIR *dirp);
+	int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result); //readdir 的可重入版本
+	void seekdir(DIR *dirp, long offset);//设置 readfir 函数的读取指针位置。
+	off_t telldir(DIR *dir); //返回目录流当前的读取位置
+	int mkdir(const char *pathname, mode_t mode); //创建目录,mode 是目录权限。
+	int rmdir(const char *pathname); //删除目录。只能删除空目录
+	int chmod(const char* path, mode_t mode); //mode 形如： 0777
+#include <unistd.h>
+	char *getcwd(char *buf, size_t size); //获取当前目录，相当于 pwd 命令,输入的路径除了最后一层
+	char *getwd(char *buf);
+	char *get_current_dir_name(void); //得到绝对路径
+	int chdir(const char *path); //修改当前工作目录，即切换目录，相当于 cd 命令
+
+#include <libgen.h>//剔除目录函数的头文件
+	char *basename(char *path); //只留下最后一层
+
+#include <string.h>//字符串拷贝
+char *strdup(const char *s);
+char *strndup(const char *s, size_t n);
+char *strdupa(const char *s);
+char *strndupa(const char *s, size_t n);
+	
+	
+
+
+
+
+#include <sys/stat.h>//获取文件状态函数头文件
+#include <sys/types.h>
+#include <unistd.h>
+	
+	struct stat {
+				dev_t st_dev; /* 文件所在设备的标识 */
+				ino_t st_ino; /* 文件结点号 */
+				mode_t st_mode; /* 文件保护模式 */
+				nlink_t st_nlink; /* 硬连接数 */
+				uid_t st_uid; /* 文件用户标识 */
+				gid_t st_gid; /* 文件用户组标识 */
+				dev_t st_rdev; /* 文件所表示的特殊设备文件的设备标识 */
+				off_t st_size; /* 总大小，单位为字节*/
+				blksize_t st_blksize; /* 文件系统的块大小 */
+				blkcnt_t st_blocks; /* 分配给文件的块的数量， 512 字节为单元 */
+				time_t st_atime; /* 最后访问时间 time_t 实际就一个长整型，保存的是秒数，可以使用 ctime 函数转为字符
+				串*/
+				time_t st_mtime; /* 最后修改时间 */
+				time_t st_ctime; /* 最后状态改变时间 */
+			};
+	
+	S_ISLNK(st_mode): 是否是一个连接.
+	S_ISREG()是否是一个常规文件.
+	S_ISDIR()是否是一个目录
+	S_ISCHR()是否是一个字符设备.
+	S_ISBLK()是否是一个块设备
+	S_ISFIFO()是否是一个 FIFO 文件.
+	S_ISSOCK()是否是一个 SOCKET 文件.
+	int stat(const char *path, struct stat *buf); //获取文件的状态保存在 buf 里。（可以直接传入文件路径）
+	int fstat(int fd, struct stat *buf); //获取文件的状态保存在 buf 里（针对已经打开的文件进行操作）
+	int lstat(const char *path, struct stat *buf);//获取文件的状态保存在 buf 里。（不区分链接文件）
+	
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+#include <stdio.h> //基于文件指针的函数
+
+	FILE *fopen(const char *path,const char *mode);
+	FILE *fdopen(int filds,const char *mode);
+	FILE *freopen(const char *path,const char *mode, FILE *stream);
+	int fclose(FILE *stream);
+	int fgetc(FILE *fp)；//文件中获得一个字符
+	int fputc(int ch,FILE *fp)；//向文件写入一个字符
+	char *fgets(char *str,int n,FILE *fp);
+	int fputs(char *str,FILE *fp)；
+	int fprintf(FILE *fp,char *format,arg_list)；//向文件写格式化数据
+	int fscanf (FILE *fp,char *format,arg_list)；//格式化读数据
+	int fread(void *buffer,unsigned sife,unsigned count,FILE *fp)
+	int fwrite(void *buffer,unsigned sife,unsigned count,FILE *fp)
+	int getw(FILE *fp) //以二进制形式到文件读取一个整数
+	int putw(int n,FILE *fp) //以二进制形式向文件存一个整数
+	int feof(FILE *fp)；//用来侦测读写文件指针是否读取到了文件尾。
+	long ftell(FILE *fp)；//文件指针当前位置
+	void rewind(FILE *fp)；//回到文件指针头
+	int fseek(FILE *fp,long offset,int base)；//定位 参数3：SEEK_SET SEEK_CUR SEEK_END 
+	FILE *tmpfile(void) //以二进制更新模式(wb+)创建临时文件。被创建的临时文件会在流关闭的时候或者在程序终止的时候自动删除。
+	int fsetpos(FILE *stream, fpos_t *pos);
+	int fgetpos(FILE *stream, fpos_t *pos);
+	int rename(const char *oldpath, const char *newpath);//重命名
+	
+
+
+
+#include <fcntl.h>//文件描述符的头文件
+#include <unistd.h>
+	int open(const char *pathname, int flags); //文件名 打开方式
+	int open(const char *pathname, int flags, mode_t mode);//文件名 打开方式 权限
+	int close(int fd); //关闭文件， fd 表示文件描述符
+	size_t read(int fd, void *buf, size_t count);//文件描述词 缓冲区 长度
+	size_t write(int fd, const void *buf, size_t count);
+#include <stdio.h>
+	FILE * fdopen(int filedes, const char *opentype); //文件指针与文件描述符的转换
+	int fileno(FILE *stream);//把文件流指针转换成文件描述符用 fileno 函数
+	int remove(const char *pathname);//删除文件或目录
+	
+
+
+#include <unistd.h>//形参解析函数头文件
+	int getopt(int argc, char * const argv[], const char *optstring);//只支持短形参-r等等
+	extern char *optarg; //头文件里面的全局变量，可直接调用
+	extern int optind, opterr, optopt;
+	第三个参数传入想要定义到参数类型，如-a，-b，-c等，填入形式"abc",或"a:b:c:",加:可以在这个参数后面传入字符串
+
+#include <getopt.h>
+	int getopt_long(int argc, char * const argv[], const char *optstring,const struct option *longopts, int *longindex);//兼容短形参-r和长形参--r
+	
+	使用:
+		 struct option ionion[]=
+      {
+         {"yjw",1,NULL,'y'},
+          {"sll",1,NULL,'s'},
+          {"lzj",0,NULL,'l'},//0代表不要参数带字符串
+          {0,0,0,0},
+      };
+      int res=0;
+      int longindex=0;
+      while(1)
+      {
+          res = getopt_long(argc,argv,"a:b:c:d:",ionion,&longindex);
+          if(res==-1)break;
+          switch(res)
+         {
+             case 'a':
+                  printf("-a:%s\n",optarg);
+                  break;
+              case 'b':
+                  printf("-b:%s\n",optarg);
+                  break;
+              case 'c':
+                  printf("-c:%s\n",optarg);
+                  break;
+              case 'd':
+                  printf("-d:%s\n",optarg);
+                  break;
+              case 'y':
+                 printf("-yjw:%s offset:%d\n",optarg,longindex);
+                  break;
+              case 's':
+                  printf("-sll:%s offset:%d\n",optarg,longindex);
+                  break;
+              case 'l':
+                  printf("-lzj:%s offset:%d\n",optarg,longindex);
+                  //printf("-lzj\n");
+                  break;
+          }
+      }
+
+	
+
+
+#include <dlfcn.h>//打开动态库的函数头文件
+
+	void *dlopen(const char *filename, int flag);//动态库的路径加名字，
+	char *dlerror(void);
+	void *dlsym(void *handle, const char *symbol);//dlopen的返回值，函数名或者变量名
+	int dlclose(void *handle);
+	编译时加-ldl
+	
+	使用:
+		/*核心:打开动态库,*/
+      void *handle;
+      int (*add)(int,int,char);//保存获取到的函数的函数指针
+      int *data;
+      handle = dlopen("sum/libsum.so",RTLD_LAZY);
+      if(handle==NULL)
+      {
+          printf("找库失败\n");
+          exit(0);
+      }
+      //调用,函数"sum"或者动态库中的全局变量"data"
+      add = dlsym(handle,"sum");
+      data = dlsym(handle,"ddd");
+      if(add==NULL)
+      {
+          printf("找函数失败\n");
+          exit(0);
+      }
+  
+      int a = atoi(argv[1]);
+      int b = atoi(argv[2]);
+      char c = argv[3][0];
+      int z = add(a,b,c);
+      printf("ddd:%d\n",*data);
+      printf("运算结果:%d\n",z);
+      //关闭
+      dlclose(handle);
+
+
+#include <stdlib.h> //获取环境变量的函数头文件
+	/*全部只在当前进程里有效*/
+	char *getenv(const char *name);  //获取环境变量的值 常用
+	int clearenv(void);           //清除环境变量的值
+	int setenv(const char *name, const char *value, int overwrite);// 用来改变或增加环境变量的内容。	
+	int putenv(char *string); //用来改变或者增加环境变量的内容  
+	int unsetenv(const char* name) //删除 name 环境变量的定义，即使不存在也不会出错
+ 
+	
+	使用：
+		char *env_p;
+		env_p=getenv("PATH");
+		if(env_p==NULL)exit(0);
+		printf("PATH=%s\n",env_p);
+
+
+
+
+
+automake自动生成Makefile工具简单使用:
+	1.写好代码后顶层目录下敲命令:autoscan
+	2.把生成的configure.scan改为.ac后缀
+	3.修改.ac后缀文件的内容
+		:AC_INIT([yjw], [1.2.3], [2453013768@qq.com])  //三个方括号内改为自己想要的东西，分别代表：生成的可执行名、版本号、联系地址
+		 AC_CONFIG_SRCDIR([main/main.c])               //自动识别包含main函数的主文件，但是又可能识别失败，需要自行修改
+		 AC_PROG_CC   								   //默认gcc编译器，修改可在变量后直接跟小括号，内填编译器名
+		 AC_PROG_RANLIB								   //当需要生成静态库时，要加上此全局变量
+		 AM_INIT_AUTOMAKE(yjw,1.2.3)				   //都要加上这句话，两个参数和上面的要一致
+		 AC_OUTPUT									   //该变量指定在哪生成Makefile文件,如:
+													   //	AC_OUTPUT(Makefile main/Makefile sub/Makefile sum/Makefile)
+	4.执行 aclocal 命令生成 aclocal.m4 文件 
+	5.使用 autoconf 工具生成 configure 文件
+	6.使用 autoheader 生成 config.h.in 文件 	       //4、5、6是分别打上命令回车即可
+	7.在AC_OUT指定的几个地方分别创建Makefile.am文件,打开分别编写各自的内容
+	8.执行automake --add-missing
+	9.执行./configure --prefix=路径
+	10.执行make 进行编译
+	11.执行make install 进行安装
+
+
+#include <unistd.h>
+
+extern char **environ;
+
+int execl(const char *path, const char *arg, ...);
+int execlp(const char *file, const char *arg, ...);
+int execle(const char *path, const char *arg,
+		  ..., char * const envp[]);
+int execv(const char *path, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+
+
+
+
+
+
+
+

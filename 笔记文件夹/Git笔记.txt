@@ -1,0 +1,14 @@
+git 命令行命令
+
+一、本地库初始化
+		命令						效果								注意事项															作用
+		git init					当前文件下生成一个隐藏文件.git		.git目录下存放的是本地库和相关的子目录、文件。不要删除和随意修改
+		
+		 1.git config user.name xxx	签名：用户名和邮箱地址				这里设置的签名和登录远程库也就是代码托管中心的账号密码没有关系		区分不同开发人员的身份
+		   git config user.email xxx@xxx.xxx
+		 2.git config --global user.name xxx 		1.项目级别/仓库级别：仅在当前本地库范围内有效   2.系统用户级别:登录当前操作系统的用户范围(范围更大)  优先级前者高。(两个签名都有时，优先使用项目级别的签名)二者都没有是不允许的。至少要设置一个签名    
+		   git config --global user.email xxx@xxx.xxx			项目级别签名信息保存在.git/config，系统级别签名保存在 home目录下的.gitconfig中(cd ~进入home目录)
+		
+		git status 																															获取本地库的状态，
+		
+		git add 
